@@ -36,14 +36,19 @@ typedef NS_ENUM(NSUInteger, FrameType) {
 @property (nonatomic, assign) FrameType type;
 @end
 
-@interface VideoFrame : Frame
+@interface AudioFrame : Frame
 @property (nonatomic, strong) NSData *samples;
+@property (nonatomic, assign) CGFloat duration;
+@property (nonatomic, assign) CGFloat position;
+
 @end
 
-@interface AudioFrame : Frame
+@interface VideoFrame : Frame
 @property (nonatomic, strong) NSData *luma;
 @property (nonatomic, strong) NSData *chromaB;
 @property (nonatomic, strong) NSData *chromaR;
+@property (nonatomic, assign) CGFloat position;
+@property (nonatomic, assign) CGFloat duration;
 @end
 
 
@@ -51,7 +56,7 @@ typedef NS_ENUM(NSUInteger, FrameType) {
 
 
 - (BOOL)openFile:(NSString *)filePath parameters:(NSDictionary *)parameters;
-- (NSArray *)decodeFrame:(CGFloat)minDuration;
+- (NSArray *)decodeFrames:(CGFloat)minDuration;
 - (void)clearResource;
 @end
 
