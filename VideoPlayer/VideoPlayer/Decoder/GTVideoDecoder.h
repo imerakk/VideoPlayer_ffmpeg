@@ -40,7 +40,6 @@ typedef NS_ENUM(NSUInteger, FrameType) {
 @property (nonatomic, strong) NSData *samples;
 @property (nonatomic, assign) CGFloat duration;
 @property (nonatomic, assign) CGFloat position;
-
 @end
 
 @interface VideoFrame : Frame
@@ -54,10 +53,10 @@ typedef NS_ENUM(NSUInteger, FrameType) {
 
 @interface GTVideoDecoder : NSObject
 
-
 - (BOOL)openFile:(NSString *)filePath parameters:(NSDictionary *)parameters;
 - (NSArray *)decodeFrames:(CGFloat)minDuration;
 - (void)clearResource;
+
 @end
 
 NS_ASSUME_NONNULL_END

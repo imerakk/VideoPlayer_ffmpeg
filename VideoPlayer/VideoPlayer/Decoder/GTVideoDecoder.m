@@ -122,7 +122,19 @@ static NSData *copyFrameData(uint8_t *src, int length) {
     if (_audioCodecContext) {
         avcodec_free_context(&_audioCodecContext);
     }
-
+    if (_swsContext) {
+        sws_freeContext(_swsContext);
+        _swsContext = NULL;
+    }
+    if (_audioFrame) {
+        av_frame_free(&_audioFrame);
+    }
+    if (_videoFrame) {
+        av_frame_free(&_videoFrame);
+    }
+    if (_swrContext) {
+        swr_free(&_swrContext);
+    }
 }
 
 - (NSArray *)decodeFrames:(CGFloat)minDuration {
@@ -366,7 +378,6 @@ static NSData *copyFrameData(uint8_t *src, int length) {
                 NSLog(@"fail swr_init for audio");
                 return NO;
             }
-            
         }
         
         _audioFrame = av_frame_alloc();
@@ -423,6 +434,5 @@ static NSData *copyFrameData(uint8_t *src, int length) {
     unsigned int fpsProbeSzie = [paramaters[FPS_PROBE_SIZE] unsignedIntValue];
     formatContext->fps_probe_size = fpsProbeSzie;
 }
-
 
 @end

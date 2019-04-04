@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F07831EB2254CBB40094FA8D /* GTAudioOutput.m in Sources */ = {isa = PBXBuildFile; fileRef = F07831EA2254CBB40094FA8D /* GTAudioOutput.m */; };
 		F0C35178224DC964002D56EA /* libavcodec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C35172224DC964002D56EA /* libavcodec.a */; };
 		F0C35179224DC964002D56EA /* libavfilter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C35173224DC964002D56EA /* libavfilter.a */; };
 		F0C3517A224DC964002D56EA /* libavformat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C35174224DC964002D56EA /* libavformat.a */; };
@@ -49,6 +50,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		F07831E92254CBB40094FA8D /* GTAudioOutput.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GTAudioOutput.h; sourceTree = "<group>"; };
+		F07831EA2254CBB40094FA8D /* GTAudioOutput.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GTAudioOutput.m; sourceTree = "<group>"; };
 		F0C35100224DC964002D56EA /* ac3_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ac3_parser.h; sourceTree = "<group>"; };
 		F0C35101224DC964002D56EA /* adts_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = adts_parser.h; sourceTree = "<group>"; };
 		F0C35102224DC964002D56EA /* avcodec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = avcodec.h; sourceTree = "<group>"; };
@@ -448,6 +451,8 @@
 		F0C35190224DCAA5002D56EA /* Output */ = {
 			isa = PBXGroup;
 			children = (
+				F07831E92254CBB40094FA8D /* GTAudioOutput.h */,
+				F07831EA2254CBB40094FA8D /* GTAudioOutput.m */,
 			);
 			path = Output;
 			sourceTree = "<group>";
@@ -657,6 +662,7 @@
 			files = (
 				F0E725E7224DC903004ACF8B /* ViewController.m in Sources */,
 				F0E725F2224DC905004ACF8B /* main.m in Sources */,
+				F07831EB2254CBB40094FA8D /* GTAudioOutput.m in Sources */,
 				F0E725E4224DC903004ACF8B /* AppDelegate.m in Sources */,
 				F0C35194224DCADF002D56EA /* GTVideoDecoder.m in Sources */,
 			);
