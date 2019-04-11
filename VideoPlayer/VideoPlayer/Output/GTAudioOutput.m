@@ -165,10 +165,22 @@ static OSStatus inputRenderCallBack(void *inRefCon, AudioUnitRenderActionFlags *
     
     AURenderCallbackStruct callbackStruct;
     callbackStruct.inputProcRefCon = (__bridge void *)self;
-//    callbackStruct.inputProc
+    callbackStruct.inputProc = &inputRenderCallBack;
     
+    status = AudioUnitSetProperty(_convertUnit, kAudioUnitProperty_SetRenderCallback, kAudioUnitScope_Input, 0, &callbackStruct, sizeof(callbackStruct));
     
-    
+    CheckStatus(status, @"Could not set render callback on mixer input scope");
+}
+
+- (BOOL)play {
+    OSStatus status = AUGraphStart(_auGraph);
+    CheckStatus(status, @"Could not start graph");
+    return status == noErr;
+}
+
+- (void)stop {
+    OSStatus status = AUGraphStop(_auGraph);
+    CheckStatus(status, @"Could not stop graph");
 }
 
 @end

@@ -20,7 +20,8 @@
     // Do any additional setup after loading the view, typically from a nib.
     
 //    GTVideoDecoder *videoDecoder = [[GTVideoDecoder alloc] init];
-//    [videoDecoder test];
+    //    [videoDecoder test];
+    
 }
 
 

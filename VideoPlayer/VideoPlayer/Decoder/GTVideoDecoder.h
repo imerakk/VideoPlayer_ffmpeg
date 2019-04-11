@@ -48,6 +48,9 @@ typedef NS_ENUM(NSUInteger, FrameType) {
 @property (nonatomic, strong) NSData *chromaR;
 @property (nonatomic, assign) CGFloat position;
 @property (nonatomic, assign) CGFloat duration;
+@property (nonatomic, assign) NSInteger width;
+@property (nonatomic, assign) NSInteger height;
+@property (nonatomic, assign) CGFloat lineSize;
 @end
 
 
@@ -56,6 +59,9 @@ typedef NS_ENUM(NSUInteger, FrameType) {
 - (BOOL)openFile:(NSString *)filePath parameters:(NSDictionary *)parameters;
 - (NSArray *)decodeFrames:(CGFloat)minDuration;
 - (void)clearResource;
+
+- (NSInteger)videoWidth;
+- (NSInteger)videoHeight;
 
 @end
 

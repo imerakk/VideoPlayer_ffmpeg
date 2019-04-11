@@ -247,6 +247,9 @@ static NSData *copyFrameData(uint8_t *src, int length) {
             videoFrame.chromaR = copyFrameData(_videoBuffer[2], _videoBufferLineSize[2]*_videoCodecContext->height);
         }
         videoFrame.type = VideoFrameType;
+        videoFrame.width = _videoCodecContext->width;
+        videoFrame.height = _videoCodecContext->height;
+        videoFrame.lineSize = _videoFrame->linesize[0];
         videoFrame.position = _videoFrame->best_effort_timestamp * _videoTimeBase;
         videoFrame.duration = _videoFrame->pkt_duration * _videoTimeBase;
         [videoFrames addObject:videoFrame];
@@ -433,6 +436,14 @@ static NSData *copyFrameData(uint8_t *src, int length) {
     
     unsigned int fpsProbeSzie = [paramaters[FPS_PROBE_SIZE] unsignedIntValue];
     formatContext->fps_probe_size = fpsProbeSzie;
+}
+
+- (NSInteger)videoWidth {
+    return _videoCodecContext->width;
+}
+
+- (NSInteger)videoHeight {
+    return _videoCodecContext->height;
 }
 
 @end
