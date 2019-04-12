@@ -7,7 +7,7 @@
 //
 
 #import "ViewController.h"
-#import "GTVideoDecoder.h"
+#import "GTVideoPlayerViewController.h"
 
 @interface ViewController ()
 
@@ -19,9 +19,20 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
-//    GTVideoDecoder *videoDecoder = [[GTVideoDecoder alloc] init];
-    //    [videoDecoder test];
-    
+    UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
+    btn.frame = CGRectMake(100, 100, 200, 70);
+    [btn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [btn setTitle:@"play" forState:UIControlStateNormal];
+    [btn addTarget:self action:@selector(play) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:btn];
+}
+
+- (void)play {
+//    NSString *filePath = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"test.flv"];
+    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"test" ofType:@"flv"];
+    GTVideoPlayerViewController *player = [GTVideoPlayerViewController viewControllerWithFilePath:filePath contentFrame:self.view.bounds parameters:nil];
+    [player play];
+    [self.navigationController pushViewController:player animated:YES];
 }
 
 

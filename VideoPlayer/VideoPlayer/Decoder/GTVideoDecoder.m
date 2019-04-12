@@ -218,7 +218,7 @@ static NSData *copyFrameData(uint8_t *src, int length) {
     
     int res = avcodec_send_packet(_videoCodecContext, packet);
     if (res < 0) {
-        NSLog(@"fail avcodec_send_framen for video");
+        NSLog(@"fail avcodec_send_frame for video");
         return nil;
     }
     
@@ -377,7 +377,7 @@ static NSData *copyFrameData(uint8_t *src, int length) {
         SwrContext *swrContext = NULL;
         if (!(codecContext->sample_fmt == AV_SAMPLE_FMT_S16)) { //重采样
             swrContext = swr_alloc_set_opts(NULL, codecContext->channel_layout, AV_SAMPLE_FMT_S16, codecContext->sample_rate, codecContext->channel_layout, codecContext->sample_fmt, codecContext->sample_rate, 0, NULL);
-            if (!swrContext || !swr_init(swrContext)) {
+            if (!swrContext || swr_init(swrContext)) {
                 NSLog(@"fail swr_init for audio");
                 return NO;
             }
@@ -439,11 +439,27 @@ static NSData *copyFrameData(uint8_t *src, int length) {
 }
 
 - (NSInteger)videoWidth {
-    return _videoCodecContext->width;
+    return _videoCodecContext ? _videoCodecContext->width : 0;
 }
 
 - (NSInteger)videoHeight {
-    return _videoCodecContext->height;
+    return _videoCodecContext ? _videoCodecContext->height : 0;
+}
+
+- (NSInteger)vaildVideo {
+    return _videoStreamIndex != -1;
+}
+
+- (NSInteger)vaildAudio {
+    return _audioStreamIndex != -1;
+}
+
+- (NSInteger)audioChannels {
+    return _audioCodecContext ? _audioCodecContext->channels : 0;
+}
+
+- (NSInteger)audioSampleRate {
+    return _audioCodecContext ? _audioCodecContext->sample_rate : 0;
 }
 
 @end

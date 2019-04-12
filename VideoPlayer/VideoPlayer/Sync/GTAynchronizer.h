@@ -18,11 +18,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)openFile:(NSString *)filePath parameters:(NSDictionary *)parameters;
 
+- (void)closeFile;
+
 - (void)audioCallBackFillData:(SInt16 *)outData
-                    numFrames:(UInt32)numFrame
-                  numChannels:(UInt32)numChannels;
+                    numFrames:(NSInteger)numFrames
+                  numChannels:(NSInteger)numChannels;
 
 - (VideoFrame *)getCorrectVideoFrame;
+
+- (NSInteger)videoWidth;
+- (NSInteger)videoHeight;
+
+- (NSInteger)audioChannels;
+- (NSInteger)audioSampleRate;
 
 
 @end
