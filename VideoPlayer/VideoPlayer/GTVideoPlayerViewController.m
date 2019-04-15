@@ -49,13 +49,14 @@
         if (strongSelf) {
             BOOL res = [strongSelf->_sync openFile:strongSelf->_filePath parameters:strongSelf->_parameters];
             if (res) {
-                strongSelf->_videoOutput = [strongSelf createVideoOutput];
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    self.view.backgroundColor = [UIColor whiteColor];
+                    strongSelf->_videoOutput = [strongSelf createVideoOutput];
+                    strongSelf.view.backgroundColor = [UIColor whiteColor];
                     [strongSelf.view addSubview:strongSelf->_videoOutput];
+                    strongSelf->_audioOutput = [strongSelf createAudioOutput];
+                    
+                    [strongSelf play];
                 });
-                
-                strongSelf->_audioOutput = [strongSelf createAudioOutput];
             }
         }
     });
@@ -135,5 +136,8 @@
     return 1;
 }
 
+- (void)dealloc {
+    [self stop];
+}
 
 @end

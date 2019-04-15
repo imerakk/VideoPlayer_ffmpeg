@@ -26,29 +26,39 @@ static NSArray *collectStreams(AVFormatContext *formatContext, enum AVMediaType 
 }
 
 static void avStreamFPSTimeBase(AVStream *stream, CGFloat defaultTimeBase, CGFloat *pFPS, CGFloat *pTimeBase) {
-    if (stream == NULL || pFPS == NULL || pTimeBase == NULL) {
-        return;
+    if (pTimeBase) {
+        if (stream->time_base.den && stream->time_base.num) {
+            *pTimeBase = av_q2d(stream->time_base);
+        }
+        else {
+            *pTimeBase = defaultTimeBase;
+        }
     }
-    
-    if (stream->time_base.den && stream->time_base.num) {
-        *pTimeBase = av_q2d(stream->time_base);
-    }
-    else {
-        *pTimeBase = defaultTimeBase;
-    }
-    
-    if (stream->avg_frame_rate.den && stream->avg_frame_rate.num) {
-        *pFPS = av_q2d(stream->avg_frame_rate);
-    }
-    else {
-        *pFPS = 1.0 / *pTimeBase;
+
+    if (pFPS) {
+        if (stream->avg_frame_rate.den && stream->avg_frame_rate.num) {
+            *pFPS = av_q2d(stream->avg_frame_rate);
+        }
+        else {
+            *pFPS = 1.0 / *pTimeBase;
+        }
     }
 }
 
-static NSData *copyFrameData(uint8_t *src, int length) {
-    NSMutableData *data = [NSMutableData data];
-    [data appendBytes:src length:length];
-    return [data copy];
+static NSData *copyFrameData(UInt8 *src, int lineSize, int width, int height) {
+//    width = MIN(width, lineSize);
+//    NSMutableData *data = [NSMutableData data];
+//    [data appendBytes:src length:width*height];
+//    return [data copy];
+    width = MIN(lineSize, width);
+    NSMutableData *md = [NSMutableData dataWithLength: width * height];
+    Byte *dst = md.mutableBytes;
+    for (NSUInteger i = 0; i < height; ++i) {
+        memcpy(dst, src, width);
+        dst += width;
+        src += lineSize;
+    }
+    return md;
 }
 
 @implementation Frame
@@ -113,8 +123,8 @@ static NSData *copyFrameData(uint8_t *src, int length) {
     _videoStreamIndex = -1;
     _audioStreamIndex = -1;
     if (_formatContext) {
-        avformat_free_context(_formatContext);
         avformat_close_input(&_formatContext);
+        avformat_free_context(_formatContext);
     }
     if (_videoCodecContext) {
         avcodec_free_context(&_videoCodecContext);
@@ -223,7 +233,7 @@ static NSData *copyFrameData(uint8_t *src, int length) {
     }
     
     NSMutableArray *videoFrames = [NSMutableArray array];
-    while (res > 0) {
+    while (res >= 0) {
         res = avcodec_receive_frame(_videoCodecContext, _videoFrame);
         if (!_videoFrame->data[0]) {
             break;
@@ -231,9 +241,10 @@ static NSData *copyFrameData(uint8_t *src, int length) {
         
         VideoFrame *videoFrame = [[VideoFrame alloc] init];
         if (_videoCodecContext->pix_fmt == AV_PIX_FMT_YUV420P || _videoCodecContext->pix_fmt == AV_PIX_FMT_YUVJ420P) {
-            videoFrame.luma = copyFrameData(_videoFrame->data[0], _videoFrame->linesize[0]*_videoCodecContext->height);
-            videoFrame.chromaB = copyFrameData(_videoFrame->data[1], _videoFrame->linesize[1]*_videoCodecContext->height);
-            videoFrame.chromaR = copyFrameData(_videoFrame->data[2], _videoFrame->linesize[2]*_videoCodecContext->height);
+            videoFrame.luma = copyFrameData(_videoFrame->data[0], _videoFrame->linesize[0], _videoCodecContext->width, _videoCodecContext->height);
+            videoFrame.chromaB = copyFrameData(_videoFrame->data[1], _videoFrame->linesize[1], _videoCodecContext->width
+                                               /2, _videoCodecContext->height/2);
+            videoFrame.chromaR = copyFrameData(_videoFrame->data[2], _videoFrame->linesize[2], _videoCodecContext->width/2, _videoCodecContext->height/2);
         }
         else {
             if (!_swsContext && ![self setupScaler]) {
@@ -242,9 +253,9 @@ static NSData *copyFrameData(uint8_t *src, int length) {
             }
             
             sws_scale(_swsContext, (const uint8_t **)_videoFrame->data, _videoFrame->linesize, 0, _videoCodecContext->height, _videoBuffer, _videoBufferLineSize);
-            videoFrame.luma = copyFrameData(_videoBuffer[0], _videoBufferLineSize[0]*_videoCodecContext->height);
-            videoFrame.chromaB = copyFrameData(_videoBuffer[1], _videoBufferLineSize[1]*_videoCodecContext->height);
-            videoFrame.chromaR = copyFrameData(_videoBuffer[2], _videoBufferLineSize[2]*_videoCodecContext->height);
+            videoFrame.luma = copyFrameData(_videoBuffer[0], _videoBufferLineSize[0], _videoCodecContext->width, _videoCodecContext->height);
+            videoFrame.chromaB = copyFrameData(_videoBuffer[1], _videoBufferLineSize[1], _videoCodecContext->width, _videoCodecContext->height);
+            videoFrame.chromaR = copyFrameData(_videoBuffer[2], _videoBufferLineSize[2], _videoCodecContext->width, _videoCodecContext->height);
         }
         videoFrame.type = VideoFrameType;
         videoFrame.width = _videoCodecContext->width;
@@ -308,7 +319,8 @@ static NSData *copyFrameData(uint8_t *src, int length) {
         audioFrame.type = AudioFrameType;
         audioFrame.samples = pcmData;
         audioFrame.duration = _audioFrame->pkt_duration * _audioTimeBase;
-        audioFrame.position = _audioFrame->pkt_pos * _audioTimeBase;
+        audioFrame.position = _audioFrame->best_effort_timestamp * _audioTimeBase;
+        [audioFrames addObject:audioFrame];
     }
     
     return [audioFrames copy];

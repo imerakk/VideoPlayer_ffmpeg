@@ -8,6 +8,7 @@
 
 #import "GTAudioOutput.h"
 #import <AVFoundation/AVFoundation.h>
+#import "AVAudioSession+RouteUtils.h"
 
 static void CheckStatus(OSStatus status, NSString *message);
 static OSStatus inputRenderCallBack(void *inRefCon, AudioUnitRenderActionFlags *ioActionFlags, const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames, AudioBufferList *ioData);
@@ -39,12 +40,10 @@ static OSStatus inputRenderCallBack(void *inRefCon, AudioUnitRenderActionFlags *
         _channels = channels;
         _sampleRate = sampleRate;
         _mDelegate = delegate;
+        _outData = (SInt16 *)calloc(8192, sizeof(SInt16));
         
         [self setupAudioSession];
         [self createAudioUnitGraph];
-        [self getUnitsFromNodes];
-        [self setAudioUnitProperty];
-        [self connectAudioNodes];
     }
     
     return self;
@@ -74,15 +73,52 @@ static OSStatus inputRenderCallBack(void *inRefCon, AudioUnitRenderActionFlags *
 
 - (void)setupAudioSession {
     _audioSession = [AVAudioSession sharedInstance];
+    
     NSError *error = nil;
+    [_audioSession setCategory:AVAudioSessionCategoryPlayAndRecord error:&error];
+    if (error) {
+        NSLog(@"fail setCategory AVAudioSessionCategoryPlayAndRecord");
+    }
+    
+    error = nil;
     [_audioSession setPreferredSampleRate:_sampleRate error:&error];
     if (error) {
         NSLog(@"fail setPreferredSampleRate");
     }
+    
     error = nil;
     [_audioSession setActive:YES error:&error];
     if (error) {
         NSLog(@"fail setActive");
+    }
+
+    [self addRouteChangeListener];
+}
+
+- (void)addRouteChangeListener
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onNotificationAudioRouteChange:)
+                                                 name:AVAudioSessionRouteChangeNotification
+                                               object:nil];
+    [self adjustOnRouteChange];
+}
+
+#pragma mark - notification observer
+- (void)onNotificationAudioRouteChange:(NSNotification *)sender {
+    [self adjustOnRouteChange];
+}
+
+- (void)adjustOnRouteChange
+{
+    AVAudioSessionRouteDescription *currentRoute = [[AVAudioSession sharedInstance] currentRoute];
+    if (currentRoute) {
+        if ([[AVAudioSession sharedInstance] usingWiredMicrophone]) {
+        } else {
+            if (![[AVAudioSession sharedInstance] usingBlueTooth]) {
+                [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:nil];
+            }
+        }
     }
 }
 
@@ -91,6 +127,19 @@ static OSStatus inputRenderCallBack(void *inRefCon, AudioUnitRenderActionFlags *
     
     status = NewAUGraph(&_auGraph);
     CheckStatus(status, @"Could not create a new AUGraph");
+    
+    [self addAudioNodes];
+    [self getUnitsFromNodes];
+    [self setAudioUnitProperty];
+    [self connectAudioNodes];
+    
+    CAShow(_auGraph);
+    status = AUGraphInitialize(_auGraph);
+    CheckStatus(status, @"Could not initialize AUGraph");
+}
+
+- (void)addAudioNodes {
+    OSStatus status = noErr;
     
     AudioComponentDescription ioDescription;
     bzero(&ioDescription, sizeof(ioDescription));
@@ -131,20 +180,20 @@ static OSStatus inputRenderCallBack(void *inRefCon, AudioUnitRenderActionFlags *
     bzero(&streamFormat, sizeof(streamFormat));
     streamFormat.mSampleRate = _sampleRate;
     streamFormat.mFormatID = kAudioFormatLinearPCM;
-    streamFormat.mFormatFlags = kAudioFormatFlagIsFloat | kAudioFormatFlagIsNonInterleaved;
+    streamFormat.mFormatFlags = kAudioFormatFlagsNativeFloatPacked | kAudioFormatFlagIsNonInterleaved;
     streamFormat.mBytesPerFrame = bytesPerSample;
     streamFormat.mBytesPerPacket = bytesPerSample;
     streamFormat.mBitsPerChannel = 8 * bytesPerSample;
     streamFormat.mFramesPerPacket = 1;
     streamFormat.mChannelsPerFrame = (UInt32)_channels;
     status = AudioUnitSetProperty(_ioUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 1, &streamFormat, sizeof(streamFormat));
-    NSLog(@"Could not set property for io audio unit");
+    CheckStatus(status, @"Could not set property for convert unit input");
     
     UInt32 convertBytesPerSample = sizeof(SInt16);
     AudioStreamBasicDescription convertStreamFormat;
     bzero(&convertStreamFormat, sizeof(convertStreamFormat));
     convertStreamFormat.mFormatID = kAudioFormatLinearPCM;
-    convertStreamFormat.mFormatFlags = kAudioFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
+    convertStreamFormat.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
     convertStreamFormat.mChannelsPerFrame = (UInt32)_channels;
     convertStreamFormat.mSampleRate = _sampleRate;
     convertStreamFormat.mFramesPerPacket = 1;
@@ -181,6 +230,24 @@ static OSStatus inputRenderCallBack(void *inRefCon, AudioUnitRenderActionFlags *
 - (void)stop {
     OSStatus status = AUGraphStop(_auGraph);
     CheckStatus(status, @"Could not stop graph");
+}
+
+- (void)dealloc {
+    if (_outData) {
+        free(_outData);
+        _outData = NULL;
+    }
+    
+    [self destoryAudioGraph];
+}
+
+- (void)destoryAudioGraph {
+    AUGraphStop(_auGraph);
+    AUGraphUninitialize(_auGraph);
+    AUGraphClose(_auGraph);
+    AUGraphRemoveNode(_auGraph, _ioNode);
+    AUGraphRemoveNode(_auGraph, _convertNode);
+    DisposeAUGraph(_auGraph);
 }
 
 @end

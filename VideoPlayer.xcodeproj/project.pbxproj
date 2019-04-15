@@ -17,6 +17,7 @@
 		F0783221225F3CFD0094FA8D /* GTAynchronizer.m in Sources */ = {isa = PBXBuildFile; fileRef = F0783220225F3CFD0094FA8D /* GTAynchronizer.m */; };
 		F078322422607E560094FA8D /* GTVideoPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F078322322607E560094FA8D /* GTVideoPlayerViewController.m */; };
 		F078322A22608B270094FA8D /* test.flv in Resources */ = {isa = PBXBuildFile; fileRef = F0783227226088C00094FA8D /* test.flv */; };
+		F078322D22648D890094FA8D /* AVAudioSession+RouteUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = F078322B22648D890094FA8D /* AVAudioSession+RouteUtils.m */; };
 		F0C35178224DC964002D56EA /* libavcodec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C35172224DC964002D56EA /* libavcodec.a */; };
 		F0C35179224DC964002D56EA /* libavfilter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C35173224DC964002D56EA /* libavfilter.a */; };
 		F0C3517A224DC964002D56EA /* libavformat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C35174224DC964002D56EA /* libavformat.a */; };
@@ -78,6 +79,8 @@
 		F078322222607E560094FA8D /* GTVideoPlayerViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GTVideoPlayerViewController.h; sourceTree = "<group>"; };
 		F078322322607E560094FA8D /* GTVideoPlayerViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GTVideoPlayerViewController.m; sourceTree = "<group>"; };
 		F0783227226088C00094FA8D /* test.flv */ = {isa = PBXFileReference; lastKnownFileType = file; path = test.flv; sourceTree = "<group>"; };
+		F078322B22648D890094FA8D /* AVAudioSession+RouteUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "AVAudioSession+RouteUtils.m"; sourceTree = "<group>"; };
+		F078322C22648D890094FA8D /* AVAudioSession+RouteUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "AVAudioSession+RouteUtils.h"; sourceTree = "<group>"; };
 		F0C35100224DC964002D56EA /* ac3_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ac3_parser.h; sourceTree = "<group>"; };
 		F0C35101224DC964002D56EA /* adts_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = adts_parser.h; sourceTree = "<group>"; };
 		F0C35102224DC964002D56EA /* avcodec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = avcodec.h; sourceTree = "<group>"; };
@@ -305,6 +308,8 @@
 			children = (
 				F07831E92254CBB40094FA8D /* GTAudioOutput.h */,
 				F07831EA2254CBB40094FA8D /* GTAudioOutput.m */,
+				F078322C22648D890094FA8D /* AVAudioSession+RouteUtils.h */,
+				F078322B22648D890094FA8D /* AVAudioSession+RouteUtils.m */,
 			);
 			path = AudioOutput;
 			sourceTree = "<group>";
@@ -754,6 +759,7 @@
 			files = (
 				F078321C225F39A00094FA8D /* DirectPassRenderer.m in Sources */,
 				F078322422607E560094FA8D /* GTVideoPlayerViewController.m in Sources */,
+				F078322D22648D890094FA8D /* AVAudioSession+RouteUtils.m in Sources */,
 				F0E725E7224DC903004ACF8B /* ViewController.m in Sources */,
 				F0783221225F3CFD0094FA8D /* GTAynchronizer.m in Sources */,
 				F0783219225F39A00094FA8D /* BaseEffectFilter.m in Sources */,
@@ -939,6 +945,7 @@
 				DEVELOPMENT_TEAM = 48664Z3QZT;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/VideoPlayer/ThirdParty/ffmpeg/include";
 				INFOPLIST_FILE = VideoPlayer/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -961,6 +968,7 @@
 				DEVELOPMENT_TEAM = 48664Z3QZT;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/VideoPlayer/ThirdParty/ffmpeg/include";
 				INFOPLIST_FILE = VideoPlayer/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

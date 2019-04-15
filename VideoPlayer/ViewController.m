@@ -31,7 +31,6 @@
 //    NSString *filePath = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"test.flv"];
     NSString *filePath = [[NSBundle mainBundle] pathForResource:@"test" ofType:@"flv"];
     GTVideoPlayerViewController *player = [GTVideoPlayerViewController viewControllerWithFilePath:filePath contentFrame:self.view.bounds parameters:nil];
-    [player play];
     [self.navigationController pushViewController:player animated:YES];
 }
 

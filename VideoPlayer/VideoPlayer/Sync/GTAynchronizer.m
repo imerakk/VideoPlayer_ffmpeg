@@ -182,8 +182,8 @@ static void * runDecoderFirstBuffer(void *ptr) {
             const NSUInteger frameSizeOf = numChannels * sizeof(SInt16);
             const NSUInteger bytesToCopy = MIN(numFrames * frameSizeOf, bytesLeft);
             NSUInteger framesToCopy = bytesToCopy / frameSizeOf;
-            
-            memcmp(outData, bytes, bytesToCopy);
+        
+            memcpy(outData, bytes, bytesToCopy);
             numFrames -= framesToCopy;
             outData += framesToCopy + numChannels;
             
